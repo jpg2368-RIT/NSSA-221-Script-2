@@ -1,7 +1,6 @@
 #!/bin/python3.6
 
 import subprocess as sp
-import os
 import platform as pf
 
 # runs a command and returns the result
@@ -29,9 +28,8 @@ def get_network_info() -> tuple:
     ip = run("ip a | grep ens192 | grep inet | xargs | cut -d \" \" -f 2 | cut -d \"/\" -f 1")
     gateway = run("ip r | grep default | cut -d \" \" -f 3")
     netmask = cidr_to_netmask(run("ip a | grep ens192 | grep inet | xargs | cut -d \" \" -f 2 | cut -d \"/\" -f 2"))
-    dns1 = None
-    dns2 = None
-    return (ip, gateway, netmask, dns1, dns2)
+    dns_list = run("cat /etc/resolv.conf | grep nameserver | cut -d \" \" -f 2").split("\\n")
+    return (ip, gateway, netmask, dns_list[0], dns_list[1])
 
 def get_os_info() -> tuple:
     # os, version, kernel version
@@ -43,7 +41,9 @@ def get_os_info() -> tuple:
 
 def get_storage_info() -> tuple:
     # drive capacity (gb), available space (gb)
-    pass
+    cap = int(run("df / | grep / | xargs | cut -d ' ' -f 4"))/100000
+    avail = int(run("df / | grep / | xargs | cut -d ' ' -f 3"))/1000000
+    return (cap, avail)
 
 def get_cpu_info() -> tuple:
     # model, num cpus, num cores
@@ -51,7 +51,9 @@ def get_cpu_info() -> tuple:
 
 def get_ram_info() -> tuple:
     # total ram, available ram
-    pass
+    tot = int(run("free | grep Mem | xargs | cut -d ' ' -f 2"))/1000000
+    avail = int(run("free | grep Mem | xargs | cut -d ' ' -f 4"))/1000000
+    return (tot, avail)
 
 def wp(file, str: str):
     file.write(str)
