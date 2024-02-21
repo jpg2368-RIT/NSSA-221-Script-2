@@ -49,7 +49,7 @@ def get_storage_info() -> tuple:
 def get_cpu_info() -> tuple:
     # model, num cpus, num cores
     model = run("lscpu | grep 'Model name' | cut -d ':' -f 2 | xargs")
-    cpus = run("lscpu | grep 'CPU(s)' | cut -d ':' -f 2 | xargs")
+    cpus = run("lscpu | grep 'CPU(s):' | head -1 | cut -d ':' -f 2 | xargs")
     cores = int(run("lscpu | grep 'Core' | cut -d ':' -f 2 | xargs")) * int(cpus)
     return (model, cpus, cores)
 
@@ -70,15 +70,15 @@ def make_log(info: tuple):
         wp(file, f"\tSystem Report - {date}")
         wp(file, "")
         wp(file, "Device Information")
-        wp(file, f"\tHostname:\t{info[0][0]}")
-        wp(file, f"\tDomain:\t\t{info[0][1]}")
+        wp(file, f"\tHostname:\t\t{info[0][0]}")
+        wp(file, f"\tDomain:\t\t\t{info[0][1]}")
         wp(file, "")
 
         wp(file, "Network Information")
-        wp(file, f"\tIP Address:\t{info[1][0]}")
-        wp(file, f"\tGateway:\t{info[1][1]}")
-        wp(file, f"\tDNS 1:\t\t{info[1][2]}")
-        wp(file, f"\tDNS 2:\t\t{info[1][3]}")
+        wp(file, f"\tIP Address:\t\t{info[1][0]}")
+        wp(file, f"\tGateway:\t\t{info[1][1]}")
+        wp(file, f"\tDNS 1:\t\t\t{info[1][2]}")
+        wp(file, f"\tDNS 2:\t\t\t{info[1][3]}")
         wp(file, "")
 
         wp(file, "OS Information")
@@ -99,8 +99,8 @@ def make_log(info: tuple):
         wp(file, "")
 
         wp(file, "Memory Information")
-        wp(file, f"\tTotal RAM:\t{info[5][0]} GB")
-        wp(file, f"\tAvailable RAM:\t{info[5][1]} GB")
+        wp(file, f"\tTotal RAM:\t\t{info[5][0]} GB")
+        wp(file, f"\tAvailable RAM:\t\t{info[5][1]} GB")
 
 
 def main():
