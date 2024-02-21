@@ -1,8 +1,6 @@
 #!/bin/python3.6
 
 import subprocess as sp
-import platform as pf
-import cpuinfo as cpui
 
 # runs a command and returns the result
 def run(cmd) -> str:
@@ -14,15 +12,11 @@ def get_device_info() -> tuple:
     domain = run("hostname | cut -d '.' -f 2")
     return (hostname, domain)
 
-
 def cidr_to_netmask(cidr):
     cidr = int(cidr)
-    mask = (0xffffffff >> (32 - cidr)) << (32 - cidr)
-    return (str((0xff000000 & mask) >> 24) + "." +
-            str((0xff000000 & mask) >> 16) + "." +
-            str((0xff000000 & mask) >> 8) + "." +
-            str((0xff000000 & mask))
-            )
+    mask_bin = f"{'1'*cidr}{'0'*(32-cidr)}"
+    out = f"{int(mask_bin[0:8],2)}.{int(mask_bin[8:16],2)}.{int(mask_bin[16:24],2)}.{int(mask_bin[24:32],2)}"
+    return out
 
 def get_network_info() -> tuple:
     # ip, gateway, netmask, dns1, dns2
@@ -33,6 +27,7 @@ def get_network_info() -> tuple:
     return (ip, gateway, netmask, dns_list[0], dns_list[1])
 
 def get_os_info() -> tuple:
+    # os, version, kernel version
     os = run("cat /etc/os-release | grep 'NAME=' | head -1 | cut -d '=' -f 2")[1:-1]
     version = run("cat /etc/os-release | grep VERSION_ID | cut -d '=' -f 2")[1:-1]
     kernel_version = run("uname -r")
@@ -76,8 +71,9 @@ def make_log(info: tuple):
         wp(file, "Network Information")
         wp(file, f"\tIP Address:\t\t{info[1][0]}")
         wp(file, f"\tGateway:\t\t{info[1][1]}")
-        wp(file, f"\tDNS 1:\t\t\t{info[1][2]}")
-        wp(file, f"\tDNS 2:\t\t\t{info[1][3]}")
+        wp(file, f"\tNetmask:\t\t{info[1][2]}")
+        wp(file, f"\tDNS 1:\t\t\t{info[1][3]}")
+        wp(file, f"\tDNS 2:\t\t\t{info[1][4]}")
         wp(file, "")
 
         wp(file, "OS Information")
@@ -105,6 +101,7 @@ def make_log(info: tuple):
 def main():
     dev_info = get_device_info()
     net_info = get_network_info()
+    print(net_info)
     os_info = get_os_info()
     storage_info = get_storage_info()
     cpu_info = get_cpu_info()
