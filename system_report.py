@@ -33,10 +33,9 @@ def get_network_info() -> tuple:
     return (ip, gateway, netmask, dns_list[0], dns_list[1])
 
 def get_os_info() -> tuple:
-    # os, version, kernel version
-    os = pf.system()
-    version = pf.release()
-    kernel_version = pf.version()
+    os = run("cat /etc/os-release | grep 'NAME=' | head -1 | cut -d '=' -f 2")[1:-1]
+    version = run("cat /etc/os-release | grep VERSION_ID | cut -d '=' -f 2")[1:-1]
+    kernel_version = run("uname -r")
     return (os, version, kernel_version)
 
 
