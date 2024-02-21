@@ -2,6 +2,7 @@
 
 import subprocess as sp
 import platform as pf
+import cpuinfo as cpui
 
 # runs a command and returns the result
 def run(cmd) -> str:
@@ -47,9 +48,9 @@ def get_storage_info() -> tuple:
 
 def get_cpu_info() -> tuple:
     # model, num cpus, num cores
-    model = None
-    cpus = None
-    cores = None
+    model = run("lscpu | grep 'Model name' | cut -d ':' -f 2 | xargs")
+    cpus = run("lscpu | grep 'CPU(s)' | cut -d ':' -f 2 | xargs")
+    cores = int(run("lscpu | grep 'Core' | cut -d ':' -f 2 | xargs")) * int(cpus)
     return (model, cpus, cores)
 
 def get_ram_info() -> tuple:
