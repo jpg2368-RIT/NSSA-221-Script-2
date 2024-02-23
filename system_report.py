@@ -1,4 +1,6 @@
 #!/bin/python3.6
+# Joey Guarino
+# Feb 2024
 
 import subprocess as sp
 
@@ -49,7 +51,7 @@ def get_cpu_info() -> tuple:
     # model, num cpus, num cores
     model = run("lscpu | grep 'Model name' | cut -d ':' -f 2 | xargs")
     cpus = run("lscpu | grep 'CPU(s):' | head -1 | cut -d ':' -f 2 | xargs")
-    cores = int(run("lscpu | grep 'Core' | cut -d ':' -f 2 | xargs")) * int(cpus)
+    cores = int(run("lscpu | grep 'Core' | cut -d ':' -f 2 | xargs")) * int(cpus) # num cores * cores per cpu
     return (model, cpus, cores)
 
 # gets memory info and returns a tuple (total_ram, available_ram) both in GB
@@ -113,7 +115,7 @@ def main():
     storage_info = get_storage_info()
     cpu_info = get_cpu_info()
     ram_info = get_ram_info()
-    
+
     make_log((dev_info, net_info, os_info, storage_info, cpu_info, ram_info))
 
 if __name__ == "__main__":
